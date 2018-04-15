@@ -12,7 +12,7 @@ clean:
 	echo "Cleaned up"
 fclean: clean
 	echo "Removing object files..."
-	rm $(FILE).ko $(FILE).o $(FILE).mod.c $(FILE).mod.o modules.order Module.symvers 2>&-
+	rm -rf .$(FILE).ko.cmd .$(FILE).mod.o.cmd .$(FILE).o.cmd .cache.mk .tmp_versions $(FILE).ko $(FILE).o $(FILE).mod.c $(FILE).mod.o modules.order Module.symvers 2>&-
 	echo "Done"
 test:
 	echo "Testing..."
