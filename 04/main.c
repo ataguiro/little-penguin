@@ -21,7 +21,7 @@ static void hid_bye(struct usb_interface *interface)
 
 static struct usb_device_id hello_table [] = {
     { USB_INTERFACE_INFO(USB_INTERFACE_CLASS_HID, USB_INTERFACE_SUBCLASS_BOOT, USB_INTERFACE_PROTOCOL_KEYBOARD) },
-    { }                 /* Terminating entry */
+    { }
 };
 
 MODULE_DEVICE_TABLE(usb, hello_table);
