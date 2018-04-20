@@ -9,18 +9,45 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
 MODULE_DESCRIPTION("Hello World module");
 
+#define LOGIN "ataguiro"
+#define LOGIN_LEN 8
+
 static struct miscdevice my_dev;
 
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
-	printk(KERN_INFO "DEBUG READ\n");
-	return 0;
+	int retval = 0;
+	int len = n;
+	char *dst = LOGIN;
+
+	dst += *o;
+	if (len > LOGIN_LEN - *o)
+		len = LOGIN_LEN - *o;
+	if (!len)
+		return retval;
+	retval = copy_to_user(s, dst, len);
+	if (retval == len)
+		retval = -EIO;
+	else if (retval)
+	{
+		retval = n - retval;
+		*o = LOGIN_LEN - retval;
+	}
+	return retval;
 }
 
 static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
-	printk(KERN_INFO "DEBUG WRITE\n");
-	return 0;
+	char buf[LOGIN_LEN];
+	int retval = 0;	
+
+	printk(KERN_INFO "n = %ld\n", n);
+	if (n != LOGIN_LEN)
+		return -EINVAL;
+	retval = copy_from_user(buf, s, LOGIN_LEN);
+	if (!strncmp(buf, s, LOGIN_LEN))
+		return LOGIN_LEN;
+	return -EINVAL;
 }
 
 struct file_operations my_fops = {
