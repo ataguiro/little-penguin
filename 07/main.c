@@ -11,11 +11,20 @@ MODULE_DESCRIPTION("Hello World module");
 static struct dentry *my_root;
 
 static int __init hello_init(void) {
+	int retval = 0;
+
 	printk(KERN_INFO "Hello World !\n");
 	my_root = debugfs_create_dir("fourtytwo", NULL);
 	if (!my_root)
-		return -ENOENT;
-	return 0;
+	{
+		retval = -ENOENT;
+		goto out;
+	}
+
+out:
+	if (!my_root)
+		debugfs_remove_recursive(&my_root);
+	return retval;
 }
 
 static void __exit hello_cleanup(void) {

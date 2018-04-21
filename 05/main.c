@@ -13,7 +13,7 @@ MODULE_DESCRIPTION("Hello World module");
 #define LOGIN_LEN 8
 
 static struct miscdevice my_dev;
-
+/*
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	int retval = 0;
@@ -37,6 +37,7 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 out:
 	return retval;
 }
+*/
 
 static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
@@ -50,12 +51,32 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 	}
 	retval = copy_from_user(buf, s, LOGIN_LEN);
 	printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n);
-	if (!strncmp(buf, LOGIN, LOGIN_LEN))
-		retval = LOGIN_LEN;
-	else
-		retval = -EINVAL;
+	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
 	return retval;
+}
+
+
+static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
+{
+	char *buf = LOGIN;
+
+	if (*o >= LOGIN_LEN)
+	{
+		n = 0;
+		goto out;
+	}
+	if (*o + n > LOGIN_LEN)
+		n = LOGIN_LEN - *o;
+	if (copy_to_user(s, buf + *o, n))
+	{
+		n = -EFAULT;
+		goto out;
+	}
+	*o += n;
+	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
+out:
+	return n;
 }
 
 struct file_operations my_fops = {
