@@ -21,18 +21,14 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 	char *dst = LOGIN;
 
 	dst += *o;
-	if (len > LOGIN_LEN - *o)
-		len = LOGIN_LEN - *o;
+	if (len > LOGIN_LEN)
+		len = LOGIN_LEN;
 	if (!len)
-		return retval;
+		goto out;
 	retval = copy_to_user(s, dst, len);
 	if (retval == len)
-		retval = -EIO;
-	else if (retval)
-	{
-		retval = n - retval;
-		*o = LOGIN_LEN - retval;
-	}
+		retval = len;
+out:
 	return retval;
 }
 
