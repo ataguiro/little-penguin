@@ -17,17 +17,23 @@ static struct miscdevice my_dev;
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	int retval = 0;
-	int len = n;
+	size_t len = n;
 	char *dst = LOGIN;
 
+	if (*o >= LOGIN_LEN)
+	{
+		*o = 0;
+		goto out;
+	}
 	dst += *o;
-	if (len > LOGIN_LEN)
-		len = LOGIN_LEN;
+	len = (len > LOGIN_LEN) ? LOGIN_LEN : len;
 	if (!len)
 		goto out;
 	retval = copy_to_user(s, dst, len);
-	if (retval == len)
-		retval = len;
+	retval = retval ? -EINVAL : len;
+	if (len == LOGIN_LEN)
+		*o += len;
+	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", dst, len);
 out:
 	return retval;
 }
@@ -35,15 +41,21 @@ out:
 static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
 	char buf[LOGIN_LEN];
-	int retval = 0;	
+	int retval = -EINVAL;	
 
-	printk(KERN_INFO "n = %ld\n", n);
 	if (n != LOGIN_LEN)
-		return -EINVAL;
+	{
+		retval = -EINVAL;
+		goto out;
+	}
 	retval = copy_from_user(buf, s, LOGIN_LEN);
-	if (!strncmp(buf, s, LOGIN_LEN))
-		return LOGIN_LEN;
-	return -EINVAL;
+	printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n);
+	if (!strncmp(buf, LOGIN, LOGIN_LEN))
+		retval = LOGIN_LEN;
+	else
+		retval = -EINVAL;
+out:
+	return retval;
 }
 
 struct file_operations my_fops = {
