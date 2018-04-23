@@ -13,8 +13,10 @@ MODULE_DESCRIPTION("Hello World module");
 #define LOGIN_LEN 8
 
 static struct dentry *my_root;
+static struct mutex g_mutex;
+static char page_buf[PAGE_SIZE] = {0};
 
-static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
+static ssize_t id_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
 	char buf[LOGIN_LEN];
 	int retval = -EINVAL;	
@@ -25,6 +27,11 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 		goto out;
 	}
 	retval = copy_from_user(buf, s, LOGIN_LEN);
+	if (retval)
+	{
+		retval = -EINVAL;
+		goto out;
+	}
 	printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n);
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
@@ -32,7 +39,7 @@ out:
 }
 
 
-static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
+static ssize_t id_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	char *buf = LOGIN;
 
@@ -52,12 +59,65 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
 out:
 	return n;
+} 
+
+static ssize_t foo_write(struct file *f, const char __user *s, size_t n, loff_t *o)
+{
+	int ret = -EINVAL;
+
+	ret = mutex_lock_interruptible(&g_mutex);
+	if (ret)
+		goto out;
+	if (n > PAGE_SIZE)
+	{
+		ret = -EINVAL;
+		goto out;
+	}
+	ret = copy_from_user(page_buf, s, n);
+	page_buf[n] = 0;
+	ret = ret ? -EINVAL : n;
+out:
+	mutex_unlock(&g_mutex);
+	return ret;
 }
 
+static ssize_t foo_read(struct file *f, char __user *s, size_t n, loff_t *o)
+{
+	int len;
 
-struct file_operations my_fops = {
-	.read = hello_read,
-	.write = hello_write
+	len = mutex_lock_interruptible(&g_mutex);
+	if (len)
+	{
+		n = len;
+		goto out;
+	}
+	len = strlen(page_buf);
+	if (*o >= len)
+	{
+		n = 0;
+		goto out;
+	}
+	if (*o + n > len)
+		n = len - *o;
+	if (copy_to_user(s, page_buf + *o, n))
+	{
+		n = -EFAULT;
+		goto out;
+	}
+	*o += n;
+out:
+	mutex_unlock(&g_mutex);
+	return n;
+}
+
+struct file_operations my_fops_id = {
+	.read = id_read,
+	.write = id_write
+};
+
+struct file_operations my_fops_foo = {
+	.read = foo_read,
+	.write = foo_write
 };
 
 static int __init hello_init(void) {
@@ -70,9 +130,11 @@ static int __init hello_init(void) {
 		retval = -ENOENT;
 		goto out;
 	}
-	if (!debugfs_create_file("id", 0644, my_root, NULL, &my_fops))
+	mutex_init(&g_mutex);
+	if (!debugfs_create_file("id", 0666, my_root, NULL, &my_fops_id)
+		|| !debugfs_create_file("foo", 0644, my_root, NULL, &my_fops_foo)
+		|| !debugfs_create_u64("jiffies", 0444, my_root, (u64*)&jiffies))
 		retval = -ENOENT;	
-
 out:
 	if (!my_root)
 		debugfs_remove_recursive(my_root);
