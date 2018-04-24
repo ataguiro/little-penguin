@@ -38,6 +38,29 @@ out:
 	return retval;
 }
 */
+/*
+static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
+{
+	char *buf = LOGIN;
+
+	if (*o >= LOGIN_LEN)
+	{
+		n = 0;
+		goto out;
+	}
+	if (*o + n > LOGIN_LEN)
+		n = LOGIN_LEN - *o;
+	if (copy_to_user(s, buf + *o, n))
+	{
+		n = -EFAULT;
+		goto out;
+	}
+	*o += n;
+	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
+out:
+	return n;
+}
+*/
 
 static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
@@ -61,14 +84,14 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	char *buf = LOGIN;
 
-	if (*o >= LOGIN_LEN)
+	if (n < LOGIN_LEN || *o >= LOGIN_LEN)
 	{
 		n = 0;
 		goto out;
 	}
-	if (*o + n > LOGIN_LEN)
-		n = LOGIN_LEN - *o;
-	if (copy_to_user(s, buf + *o, n))
+	if (n > LOGIN_LEN)
+		n = LOGIN_LEN;
+	if (copy_to_user(s, buf, n))
 	{
 		n = -EFAULT;
 		goto out;

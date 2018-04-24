@@ -43,14 +43,14 @@ static ssize_t id_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	char *buf = LOGIN;
 
-	if (*o >= LOGIN_LEN)
+	if (n < LOGIN_LEN || *o >= LOGIN_LEN)
 	{
 		n = 0;
 		goto out;
 	}
-	if (*o + n > LOGIN_LEN)
-		n = LOGIN_LEN - *o;
-	if (copy_to_user(s, buf + *o, n))
+	if (n > LOGIN_LEN)
+		n = LOGIN_LEN;
+	if (copy_to_user(s, buf, n))
 	{
 		n = -EFAULT;
 		goto out;
