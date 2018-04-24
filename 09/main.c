@@ -26,7 +26,7 @@ static int __init hello_init(void) {
 	printk(KERN_INFO "Hello World !\n");
 	kern_path("/", LOOKUP_FOLLOW, &path);
 	thedentry = path.dentry;
-	list_for_each_entry(curdentry, &thedentry->d_subdirs, d_child)
+	list_for_each_entry(curdentry, &current->fs->root.mnt->mnt_root->d_subdirs, d_child)
 	{
 		if (curdentry->d_flags & DCACHE_MOUNTED)
 			printk("%s is mounted", curdentry->d_name.name);
