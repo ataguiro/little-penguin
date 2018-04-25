@@ -38,6 +38,7 @@ out:
 	return retval;
 }
 */
+
 /*
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
@@ -56,7 +57,7 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		goto out;
 	}
 	*o += n;
-	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
+	// printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
 out:
 	return n;
 }
@@ -73,12 +74,11 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 		goto out;
 	}
 	retval = copy_from_user(buf, s, LOGIN_LEN);
-	printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n);
+	/* printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n); */
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
 	return retval;
 }
-
 
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
@@ -97,7 +97,6 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		goto out;
 	}
 	*o += n;
-	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
 out:
 	return n;
 }

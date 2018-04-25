@@ -1,10 +1,6 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
-#include <linux/debugfs.h>
-#include <linux/slab.h>
-#include <linux/uaccess.h>
-#include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <linux/kallsyms.h>
 #include <linux/mount.h>
@@ -27,8 +23,6 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
 MODULE_DESCRIPTION("Hello World module");
-
-#define PROC_NAME "mymounts"
 
 struct mnt_namespace {
         atomic_t                count;
@@ -85,8 +79,50 @@ struct mount {
         struct dentry *mnt_ex_mountpoint;
 } __randomize_layout;
 
+
+/*
+static int __init hello_init(void) {
+	struct path path;
+	struct dentry *thedentry;
+	struct dentry *curdentry;
+	char tmp[PATH_MAX];
+
+	printk(KERN_INFO "Hello World !\n");
+	kern_path("/", LOOKUP_FOLLOW, &path);
+	thedentry = path.dentry;
+	list_for_each_entry(curdentry, &current->fs->root.mnt->mnt_root->d_subdirs, d_child)
+	{
+		if (curdentry->d_flags & DCACHE_MOUNTED)
+			printk("%s is mounted", curdentry->d_name.name);
+	}
+
+	return 0;
+}*/
+
 static char buf[256] = {0};
-static char buffer_main[256] = {0};
+static char buffer_main[256] = {};
+
+/*
+static void fill_path(struct mount *parent)
+{
+	struct dentry *mnt_root = NULL;
+	char buffer[PATH_MAX];
+	char *path = "";
+
+	printk("test: %s\n", path);
+	while (1)
+	{
+		mnt_root = parent->mnt_mountpoint;
+		path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
+		if (!parent->mnt_parent || !strcmp(path, "/\0"))
+			return ;
+		printk("I am ready to send %s\n", path);
+		//printk("Sending %s to fill_path\n", path);
+		//fill_path(parent->mnt_parent);
+		parent = parent->mnt_parent;
+		strcat(buf, path);
+	}
+}*/
 
 static void fill_path(struct mount *parent)
 {
@@ -106,8 +142,7 @@ static void fill_path(struct mount *parent)
 	}
 }
 
-static int long_read(struct seq_file *m, void *v)
-{
+static int __init hello_init(void) {
 	struct mnt_namespace *ns = current->nsproxy->mnt_ns;
 	struct mount *mnt_space;
 	struct dentry *mnt_root;
@@ -124,30 +159,14 @@ static int long_read(struct seq_file *m, void *v)
 			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
 				fill_path(mnt_space->mnt_parent);
 			strcat(buf, path);
-			seq_printf(m, "mounted: %s - %s\n", mnt_space->mnt_devname, buf);
+			printk("mounted: %s - %s\n", mnt_space->mnt_devname, buf);
 		}
 	}
 	return 0;
 }
 
-static int long_open(struct inode *inode, struct file *f)
-{
-	return single_open(f, long_read, NULL);
-}
-
-struct file_operations my_mounts = {
-	.open = long_open,
-	.read = seq_read
-};
-
-static int __init hello_init(void) {
-	proc_create(PROC_NAME, 0, NULL, &my_mounts);
-	return 0;
-}
-
 static void __exit hello_cleanup(void) {
 	printk(KERN_INFO "Cleaning up module.\n");
-	remove_proc_entry(PROC_NAME, NULL);
 }
 
 module_init(hello_init);

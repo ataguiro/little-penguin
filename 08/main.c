@@ -1,13 +1,16 @@
-include <linux/module.h>
+#include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/miscdevice.h>
 #include <linux/fs.h>
 #include <linux/slab.h>
+
 // Dont have a license, LOL
+
 MODULE_LICENSE("LICENSE");
 MODULE_AUTHOR("Louis Solofrizzo <louis@ne02ptzero.me>");
 MODULE_DESCRIPTION("Useless module");
+
 static ssize_t
 myfd_read
 (
