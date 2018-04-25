@@ -133,7 +133,7 @@ static void fill_path(struct mount *parent)
 	memset(buffer, 0, 256);
 	mnt_root = parent->mnt_mountpoint;
 	path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
-	if (parent->mnt_parent && strcmp(path, "/\0"))
+	if (parent->mnt_parent->mnt_id != parent->mnt_id  && parent->mnt_parent->mnt_id)
 	{
 	//	printk("I am ready to send %s\n", path);
 		//printk("Sending %s to fill_path\n", path);
@@ -150,22 +150,18 @@ static int __init hello_init(void) {
 
 	list_for_each_entry(mnt_space, &ns->list, mnt_list)
 	{
-		memset(buf, 0, 256);
-		mnt_root = mnt_space->mnt_mountpoint;
-		memset(buffer_main, 0, 256);
-		path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
-		if (mnt_space->mnt_parent && strcmp(path, "/\0"))
+		if (mnt_space->mnt_id)
 		{
-		//	printk("Sending %s to fill_path\n", path);
-			fill_path(mnt_space->mnt_parent);
+			memset(buf, 0, 256);
+			mnt_root = mnt_space->mnt_mountpoint;
+			memset(buffer_main, 0, 256);
+			path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
+			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
+				fill_path(mnt_space->mnt_parent);
+			strcat(buf, path);
+			printk("mounted: %s - %s\n", mnt_space->mnt_devname, buf);
 		}
-		strcat(buf, path);
-		printk("mounted: %s - %s\n", mnt_space->mnt_devname, buf);
-		//printk(KERN_INFO "%s\n", )
 	}
-	//kern_path("/", LOOKUP_FOLLOW, &path);
-	//d = path.dentry;
-	//root = dget(dentry->d_sb->s_root);
 	return 0;
 }
 
