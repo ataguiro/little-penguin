@@ -99,19 +99,68 @@ static int __init hello_init(void) {
 	return 0;
 }*/
 
+static char buf[256] = {0};
+static char buffer_main[256] = {};
+
+/*
+static void fill_path(struct mount *parent)
+{
+	struct dentry *mnt_root = NULL;
+	char buffer[PATH_MAX];
+	char *path = "";
+
+	printk("test: %s\n", path);
+	while (1)
+	{
+		mnt_root = parent->mnt_mountpoint;
+		path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
+		if (!parent->mnt_parent || !strcmp(path, "/\0"))
+			return ;
+		printk("I am ready to send %s\n", path);
+		//printk("Sending %s to fill_path\n", path);
+		//fill_path(parent->mnt_parent);
+		parent = parent->mnt_parent;
+		strcat(buf, path);
+	}
+}*/
+
+static void fill_path(struct mount *parent)
+{
+	struct dentry *mnt_root = NULL;
+	char *path;
+	char buffer[256] = {0};
+
+	memset(buffer, 0, 256);
+	mnt_root = parent->mnt_mountpoint;
+	path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
+	if (parent->mnt_parent && strcmp(path, "/\0"))
+	{
+	//	printk("I am ready to send %s\n", path);
+		//printk("Sending %s to fill_path\n", path);
+		fill_path(parent->mnt_parent);
+		strcat(buf, path);
+	}
+}
+
 static int __init hello_init(void) {
 	struct mnt_namespace *ns = current->nsproxy->mnt_ns;
 	struct mount *mnt_space;
 	struct dentry *mnt_root;
-	char buffer[PATH_MAX];
-	char *path;
+	char *path = NULL;
 
-	printk("--> %p\n", ns->list);
 	list_for_each_entry(mnt_space, &ns->list, mnt_list)
 	{
+		memset(buf, 0, 256);
 		mnt_root = mnt_space->mnt_mountpoint;
-		path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
-		printk("mounted: %s\n", path);
+		memset(buffer_main, 0, 256);
+		path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
+		if (mnt_space->mnt_parent && strcmp(path, "/\0"))
+		{
+		//	printk("Sending %s to fill_path\n", path);
+			fill_path(mnt_space->mnt_parent);
+		}
+		strcat(buf, path);
+		printk("mounted: %s - %s\n", mnt_space->mnt_devname, buf);
 		//printk(KERN_INFO "%s\n", )
 	}
 	//kern_path("/", LOOKUP_FOLLOW, &path);
