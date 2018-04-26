@@ -74,7 +74,12 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 		goto out;
 	}
 	retval = copy_from_user(buf, s, LOGIN_LEN);
-	/* printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n); */
+	if (retval)
+	{
+		retval = -EIO;
+		goto out;
+	}
+	/* pintk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n); */
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
 	return retval;
@@ -86,14 +91,14 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 
 	if (n < LOGIN_LEN || *o >= LOGIN_LEN)
 	{
-		n = 0;
+		n = n < LOGIN_LEN ? -EINVAL : 0;
 		goto out;
 	}
 	if (n > LOGIN_LEN)
 		n = LOGIN_LEN;
 	if (copy_to_user(s, buf, n))
 	{
-		n = -EFAULT;
+		n = -EIO;
 		goto out;
 	}
 	*o += n;
