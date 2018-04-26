@@ -26,7 +26,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
-MODULE_DESCRIPTION("Hello World module");
+MODULE_DESCRIPTION("Hello World module printing all mountpoints as /proc device");
 
 #define PROC_NAME "mymounts"
 
@@ -100,7 +100,7 @@ static void fill_path(struct mount *parent)
 	if (parent->mnt_parent->mnt_id != parent->mnt_id  && parent->mnt_parent->mnt_id)
 	{
 		fill_path(parent->mnt_parent);
-		strcat(buf, path);
+		strncat(buf, path, strlen(path) % (256 - strlen(buf)));
 	}
 }
 
@@ -121,7 +121,7 @@ static int long_read(struct seq_file *m, void *v)
 			path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
 			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
 				fill_path(mnt_space->mnt_parent);
-			strcat(buf, path);
+			strncat(buf, path, strlen(path) % (256 - strlen(buf)));
 			seq_printf(m, "%s %s\n", mnt_space->mnt_devname, buf);
 		}
 	}

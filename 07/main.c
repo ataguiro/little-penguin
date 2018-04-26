@@ -7,7 +7,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
-MODULE_DESCRIPTION("Hello World module");
+MODULE_DESCRIPTION("Hello World module with debugfs structure");
 
 #define LOGIN "ataguiro"
 #define LOGIN_LEN 8
@@ -32,7 +32,7 @@ static ssize_t id_write(struct file *f, const char __user *s, size_t n, loff_t *
 		retval = -EIO;
 		goto out;
 	}
-	printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n);
+	/* printk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n); */
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
 	return retval;
@@ -56,7 +56,7 @@ static ssize_t id_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		goto out;
 	}
 	*o += n;
-	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
+	/* printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n); */
 out:
 	return n;
 } 
@@ -124,13 +124,13 @@ static int __init hello_init(void) {
 	int retval = 0;
 
 	printk(KERN_INFO "Hello World !\n");
+	mutex_init(&g_mutex);
 	my_root = debugfs_create_dir("fourtytwo", NULL);
 	if (!my_root)
 	{
 		retval = -ENOENT;
 		goto out;
 	}
-	mutex_init(&g_mutex);
 	if (!debugfs_create_file("id", 0666, my_root, NULL, &my_fops_id)
 		|| !debugfs_create_file("foo", 0644, my_root, NULL, &my_fops_foo)
 		|| !debugfs_create_u64("jiffies", 0444, my_root, (u64*)&jiffies))

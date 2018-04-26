@@ -6,7 +6,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
-MODULE_DESCRIPTION("Hello World module");
+MODULE_DESCRIPTION("Hello World module when usb keyboard connection");
 
 /*
 static int hid_hello(struct usb_interface *interface, const struct usb_device_id *id)
@@ -36,7 +36,7 @@ static struct usb_driver hid_driver = {
 */
 
 static int __init hello_init(void) {
-	printk(KERN_INFO "Hello World !\n");
+	printk(KERN_INFO "Hello World ! A keyboard is connected\n");
 	return 0;
 }
 

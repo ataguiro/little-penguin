@@ -7,12 +7,13 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
-MODULE_DESCRIPTION("Hello World module");
+MODULE_DESCRIPTION("Hello World module with misc char");
 
 #define LOGIN "ataguiro"
 #define LOGIN_LEN 8
 
 static struct miscdevice my_dev;
+
 /*
 static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
