@@ -99,8 +99,6 @@ static void fill_path(struct mount *parent)
 	path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
 	if (parent->mnt_parent->mnt_id != parent->mnt_id  && parent->mnt_parent->mnt_id)
 	{
-	//	printk("I am ready to send %s\n", path);
-		//printk("Sending %s to fill_path\n", path);
 		fill_path(parent->mnt_parent);
 		strcat(buf, path);
 	}
@@ -124,7 +122,7 @@ static int long_read(struct seq_file *m, void *v)
 			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
 				fill_path(mnt_space->mnt_parent);
 			strcat(buf, path);
-			seq_printf(m, "mounted: %s - %s\n", mnt_space->mnt_devname, buf);
+			seq_printf(m, "%s %s\n", mnt_space->mnt_devname, buf);
 		}
 	}
 	return 0;

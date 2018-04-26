@@ -1,2 +1,1 @@
-ACTION=="add", SUBSYSTEM=="usb", ATTR{idProduct}=="cb40", RUN+="/sbin/insmod /root/little-pinguin/04/main.ko"
-ACTION=="remove", SUBSYSTEM=="usb", ATTR{idProduct}=="cb40", RUN+="/sbin/rmmod main"
+ACTION=="add", SUBSYSTEM=="usb", ENV{ID_INPUT_KEYBOARD}=="1", RUN+="/sbin/insmod /root/little-pinguin/04/main.ko"
