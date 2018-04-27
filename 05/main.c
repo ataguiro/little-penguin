@@ -14,56 +14,6 @@ MODULE_DESCRIPTION("Hello World module with misc char");
 
 static struct miscdevice my_dev;
 
-/*
-static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
-{
-	int retval = 0;
-	size_t len = n;
-	char *dst = LOGIN;
-
-	if (*o >= LOGIN_LEN)
-	{
-		*o = 0;
-		goto out;
-	}
-	dst += *o;
-	len = (len > LOGIN_LEN) ? LOGIN_LEN : len;
-	if (!len)
-		goto out;
-	retval = copy_to_user(s, dst, len);
-	retval = retval ? -EINVAL : len;
-	if (len == LOGIN_LEN)
-		*o += len;
-	printk(KERN_INFO "Copied to user: [%s] of size %zu\n", dst, len);
-out:
-	return retval;
-}
-*/
-
-/*
-static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
-{
-	char *buf = LOGIN;
-
-	if (*o >= LOGIN_LEN)
-	{
-		n = 0;
-		goto out;
-	}
-	if (*o + n > LOGIN_LEN)
-		n = LOGIN_LEN - *o;
-	if (copy_to_user(s, buf + *o, n))
-	{
-		n = -EFAULT;
-		goto out;
-	}
-	*o += n;
-	// printk(KERN_INFO "Copied to user: [%s] of size %zu\n", buf, n);
-out:
-	return n;
-}
-*/
-
 static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_t *o)
 {
 	char buf[LOGIN_LEN];
@@ -80,7 +30,6 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 		retval = -EIO;
 		goto out;
 	}
-	/* pintk(KERN_INFO "Copied from user: [%s] of size %zu\n", buf, n); */
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
 out:
 	return retval;

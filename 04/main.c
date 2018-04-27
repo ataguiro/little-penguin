@@ -9,6 +9,7 @@ MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
 MODULE_DESCRIPTION("Hello World module when usb keyboard connection");
 
 /*
+
 static int hid_hello(struct usb_interface *interface, const struct usb_device_id *id)
 {
 	printk(KERN_INFO "Hello, a keyboard is connected!\n");
@@ -33,6 +34,7 @@ static struct usb_driver hid_driver = {
 	.probe = hid_hello,
 	.disconnect = hid_bye,
 };
+
 */
 
 static int __init hello_init(void) {

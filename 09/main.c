@@ -29,6 +29,7 @@ MODULE_AUTHOR("Adam Taguirov <ataguiro@student.42.fr>");
 MODULE_DESCRIPTION("Hello World module printing all mountpoints as /proc device");
 
 #define PROC_NAME "mymounts"
+#define MYBUFLEN 256
 
 struct mnt_namespace {
         atomic_t                count;
@@ -85,22 +86,22 @@ struct mount {
         struct dentry *mnt_ex_mountpoint;
 } __randomize_layout;
 
-static char buf[256] = {0};
-static char buffer_main[256] = {0};
+static char buf[MYBUFLEN] = {0};
+static char buffer_main[MYBUFLEN] = {0};
 
 static void fill_path(struct mount *parent)
 {
 	struct dentry *mnt_root = NULL;
 	char *path;
-	char buffer[256] = {0};
+	char buffer[MYBUFLEN] = {0};
 
-	memset(buffer, 0, 256);
+	memset(buffer, 0, MYBUFLEN);
 	mnt_root = parent->mnt_mountpoint;
 	path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
 	if (parent->mnt_parent->mnt_id != parent->mnt_id  && parent->mnt_parent->mnt_id)
 	{
 		fill_path(parent->mnt_parent);
-		strncat(buf, path, strlen(path) % (256 - strlen(buf)));
+		strncat(buf, path, strlen(path) % (MYBUFLEN - strlen(buf)));
 	}
 }
 
@@ -115,13 +116,13 @@ static int long_read(struct seq_file *m, void *v)
 	{
 		if (mnt_space->mnt_id)
 		{
-			memset(buf, 0, 256);
+			memset(buf, 0, MYBUFLEN);
 			mnt_root = mnt_space->mnt_mountpoint;
-			memset(buffer_main, 0, 256);
+			memset(buffer_main, 0, MYBUFLEN);
 			path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
 			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
 				fill_path(mnt_space->mnt_parent);
-			strncat(buf, path, strlen(path) % (256 - strlen(buf)));
+			strncat(buf, path, strlen(path) % (MYBUFLEN - strlen(buf)));
 			seq_printf(m, "%s %s\n", mnt_space->mnt_devname, buf);
 		}
 	}
