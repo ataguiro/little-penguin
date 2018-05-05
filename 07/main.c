@@ -132,7 +132,7 @@ static int __init hello_init(void) {
 	if (!debugfs_create_file("id", 0666, my_root, NULL, &my_fops_id)
 		|| !debugfs_create_file("foo", 0644, my_root, NULL, &my_fops_foo)
 		|| !debugfs_create_u64("jiffies", 0444, my_root, (u64*)&jiffies))
-		retval = -ENOENT;	
+		retval = -ENOENT;
 out:
 	if (!my_root)
 		debugfs_remove_recursive(my_root);

@@ -1,0 +1,10 @@
+[ 1561.082227] usb 1-2: new full-speed USB device number 8 using ohci-pci
+[ 1561.348736] usb 1-2: New USB device found, idVendor=05ac, idProduct=024f
+[ 1561.349189] usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[ 1561.349605] usb 1-2: Product: Apple Keyboard
+[ 1561.349972] usb 1-2: Manufacturer: Apple Inc.
+[ 1561.367065] input: Apple Inc. Apple Keyboard as /devices/pci0000:00/0000:00:06.0/usb1/1-2/1-2:1.0/0003:05AC:024F.000C/input/input17
+[ 1561.421452] apple 0003:05AC:024F.000C: input,hidraw1: USB HID v1.11 Keyboard [Apple Inc. Apple Keyboard] on usb-0000:00:06.0-2/input0
+[ 1561.431058] input: Apple Inc. Apple Keyboard as /devices/pci0000:00/0000:00:06.0/usb1/1-2/1-2:1.1/0003:05AC:024F.000D/input/input18
+[ 1561.484981] apple 0003:05AC:024F.000D: input,hidraw2: USB HID v1.11 Device [Apple Inc. Apple Keyboard] on usb-0000:00:06.0-2/input1
+[ 1561.487434] Hello World ! A keyboard is connected

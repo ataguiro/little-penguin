@@ -68,7 +68,7 @@ static int __init hello_init(void) {
 	my_dev.name = "fourtytwo";
 	my_dev.fops = &my_fops;
 	ret = misc_register(&my_dev);
-	return 0;
+	return ret;
 }
 
 static void __exit hello_cleanup(void) {

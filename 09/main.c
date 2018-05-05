@@ -93,6 +93,8 @@ static void fill_path(struct mount *parent)
 	memset(buffer, 0, MYBUFLEN);
 	mnt_root = parent->mnt_mountpoint;
 	path = dentry_path_raw(mnt_root, buffer, sizeof(buffer));
+	if (!path)
+		return;
 	if (parent->mnt_parent->mnt_id != parent->mnt_id  && parent->mnt_parent->mnt_id)
 	{
 		fill_path(parent->mnt_parent);
@@ -115,12 +117,15 @@ static int long_read(struct seq_file *m, void *v)
 			mnt_root = mnt_space->mnt_mountpoint;
 			memset(buffer_main, 0, MYBUFLEN);
 			path = dentry_path_raw(mnt_root, buffer_main, sizeof(buffer_main));
+			if (!path)
+				goto end;
 			if (mnt_space->mnt_parent->mnt_id != mnt_space->mnt_id && mnt_space->mnt_parent->mnt_id)
 				fill_path(mnt_space->mnt_parent);
 			strncat(buf, path, strlen(path) % (MYBUFLEN - strlen(buf)));
 			seq_printf(m, "%s %s\n", mnt_space->mnt_devname, buf);
 		}
 	}
+end:
 	return 0;
 }
 
@@ -136,7 +141,11 @@ struct file_operations my_mounts = {
 };
 
 static int __init hello_init(void) {
-	proc_create(PROC_NAME, 0, NULL, &my_mounts);
+	void *ret;
+	
+	ret = proc_create(PROC_NAME, 0, NULL, &my_mounts);
+	if (!ret)
+		return -ENOMEM;
 	return 0;
 }
 
