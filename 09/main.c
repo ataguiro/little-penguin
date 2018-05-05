@@ -131,6 +131,7 @@ static int long_read(struct seq_file *m, void *v)
 
 static int long_open(struct inode *inode, struct file *f)
 {
+	f->private_data = NULL;
 	return single_open(f, long_read, NULL);
 }
 
