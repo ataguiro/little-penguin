@@ -29,7 +29,7 @@ static ssize_t id_write(struct file *f, const char __user *s, size_t n, loff_t *
 	retval = copy_from_user(buf, s, LOGIN_LEN);
 	if (retval)
 	{
-		retval = -EIO;
+		retval = -EFAULT;
 		goto out;
 	}
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
@@ -51,7 +51,7 @@ static ssize_t id_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		n = LOGIN_LEN;
 	if (copy_to_user(s, buf, n))
 	{
-		n = -EIO;
+		n = -EFAULT;
 		goto out;
 	}
 	*o += n;
@@ -73,7 +73,7 @@ static ssize_t foo_write(struct file *f, const char __user *s, size_t n, loff_t 
 	}
 	ret = copy_from_user(page_buf, s, n);
 	page_buf[n] = 0;
-	ret = ret ? -EIO : n;
+	ret = ret ? -EFAULT : n;
 out:
 	mutex_unlock(&g_mutex);
 	return ret;
@@ -99,7 +99,7 @@ static ssize_t foo_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		n = len - *o;
 	if (copy_to_user(s, page_buf + *o, n))
 	{
-		n = -EIO;
+		n = -EFAULT;
 		goto out;
 	}
 	*o += n;

@@ -27,7 +27,7 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 	retval = copy_from_user(buf, s, LOGIN_LEN);
 	if (retval)
 	{
-		retval = -EIO;
+		retval = -EFAULT;
 		goto out;
 	}
 	retval = (!strncmp(buf, LOGIN, LOGIN_LEN)) ? LOGIN_LEN : -EINVAL;
@@ -48,7 +48,7 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		n = LOGIN_LEN;
 	if (copy_to_user(s, buf, n))
 	{
-		n = -EIO;
+		n = -EFAULT;
 		goto out;
 	}
 	*o += n;

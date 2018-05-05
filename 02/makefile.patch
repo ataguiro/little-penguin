@@ -1,3 +1,9 @@
+From: Adam Taguirov <ataguiro@student.42.fr>
+
+Adding "-thor_kernel" extraversion string to this kernel.
+
+Signed-off-by: Adam Taguirov <ataguiro@student.42.fr>
+---
 diff --git a/Makefile b/Makefile
 index c1a608a1bc4c..ae7ffd538d2c 100644
 --- a/Makefile
