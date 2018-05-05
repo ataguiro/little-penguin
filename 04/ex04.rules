@@ -1,1 +1,2 @@
-ACTION=="add", SUBSYSTEM=="usb", ATTR{product}=="Apple Keyboard", RUN+="/sbin/insmod /root/little-pinguin/04/main.ko"
+ACTION=="add", SUBSYSTEM=="input", ENV{ID_BUS}=="usb", ENV{ID_INPUT_KEYBOARD}=="1", RUN+="/sbin/insmod /root/little-pinguin/04/main.ko"
+#ACTION=="add", SUBSYSTEM=="usb", ATTR{product}=="Apple Keyboard", RUN+="/sbin/insmod /root/little-pinguin/04/main.ko"
