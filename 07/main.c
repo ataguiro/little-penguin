@@ -142,6 +142,7 @@ out:
 static void __exit hello_cleanup(void) {
 	printk(KERN_INFO "Cleaning up module.\n");
 	debugfs_remove_recursive(my_root);
+	mutex_destroy(&g_mutex);
 }
 
 module_init(hello_init);
