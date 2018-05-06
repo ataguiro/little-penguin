@@ -83,6 +83,7 @@ struct mount {
 
 static char buf[MYBUFLEN] = {0};
 static char buffer_main[MYBUFLEN] = {0};
+static struct mutex g_mutex;
 
 static void fill_path(struct mount *parent)
 {
@@ -131,8 +132,16 @@ end:
 
 static int long_open(struct inode *inode, struct file *f)
 {
+	int ret;
+
+	ret = mutex_lock_interruptible(&g_mutex);
+	if (ret)
+		goto end;
 	f->private_data = NULL;
-	return single_open(f, long_read, NULL);
+	ret = single_open(f, long_read, NULL);
+end:
+	mutex_unlock(&g_mutex);
+	return ret;
 }
 
 struct file_operations my_mounts = {
@@ -142,7 +151,8 @@ struct file_operations my_mounts = {
 
 static int __init hello_init(void) {
 	void *ret;
-	
+
+	mutex_init(&g_mutex);
 	ret = proc_create(PROC_NAME, 0, NULL, &my_mounts);
 	if (!ret)
 		return -ENOMEM;
@@ -152,6 +162,7 @@ static int __init hello_init(void) {
 static void __exit hello_cleanup(void) {
 	printk(KERN_INFO "Cleaning up module.\n");
 	remove_proc_entry(PROC_NAME, NULL);
+	mutex_destroy(&g_mutex);
 }
 
 module_init(hello_init);
