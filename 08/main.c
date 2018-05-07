@@ -13,6 +13,7 @@ MODULE_DESCRIPTION("Useless module");
 
 static ssize_t myfd_read(struct file *fp, char __user *user, size_t size, loff_t *offs);
 static ssize_t myfd_write(struct file *fp, const char __user *user, size_t size, loff_t *offs);
+static char *tmp2 = NULL;
 
 static const struct file_operations myfd_fops = {
 	.owner = THIS_MODULE,
@@ -39,13 +40,13 @@ static int __init myfd_init(void)
 
 static void __exit myfd_cleanup(void)
 {
+	kfree(tmp2);
 	misc_deregister(&myfd_device);
 }
 
 ssize_t myfd_read(struct file *fp, char __user *user, size_t size, loff_t *offs)
 {
 	ssize_t t, i;
-	char *tmp2;
 
 	/***************
 	 * Malloc like a boss

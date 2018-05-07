@@ -15,6 +15,6 @@ index c1a608a1bc4c..ae7ffd538d2c 100644
 -EXTRAVERSION =
 +EXTRAVERSION = -thor_kernel
  NAME = Fearless Coyote
- 
+
  # *DOCUMENTATION*
 
