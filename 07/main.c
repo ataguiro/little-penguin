@@ -73,7 +73,7 @@ static ssize_t foo_write(struct file *f, const char __user *s, size_t n, loff_t 
 
 	ret = mutex_lock_interruptible(&g_mutex);
 	if (ret)
-		goto out;
+		goto clean;
 	if (!f || !s)
 		goto out;
 	if (n > PAGE_SIZE)
@@ -86,6 +86,7 @@ static ssize_t foo_write(struct file *f, const char __user *s, size_t n, loff_t 
 	ret = ret ? -EFAULT : n;
 out:
 	mutex_unlock(&g_mutex);
+clean:
 	return ret;
 }
 
@@ -97,7 +98,7 @@ static ssize_t foo_read(struct file *f, char __user *s, size_t n, loff_t *o)
 	if (len)
 	{
 		n = len;
-		goto out;
+		goto clean;
 	}
 	if (!f || !s || !o)
 		goto out;
@@ -117,6 +118,7 @@ static ssize_t foo_read(struct file *f, char __user *s, size_t n, loff_t *o)
 	*o += n;
 out:
 	mutex_unlock(&g_mutex);
+clean:
 	return n;
 }
 

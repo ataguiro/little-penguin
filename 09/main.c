@@ -138,13 +138,14 @@ static int long_open(struct inode *inode, struct file *f)
 
 	ret = mutex_lock_interruptible(&g_mutex);
 	if (ret)
-		goto end;
+		goto clean;
 	if (!inode || !f)
 		goto end;
 	f->private_data = NULL;
 	ret = single_open(f, long_read, NULL);
 end:
 	mutex_unlock(&g_mutex);
+clean:
 	return ret;
 }
 
