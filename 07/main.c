@@ -21,6 +21,10 @@ static ssize_t id_write(struct file *f, const char __user *s, size_t n, loff_t *
 	char buf[LOGIN_LEN];
 	int retval = -EINVAL;	
 
+	if (!f || !s) {
+		retval = -EFAULT;
+		goto out;
+	}
 	if (n != LOGIN_LEN)
 	{
 		retval = -EINVAL;
@@ -42,6 +46,10 @@ static ssize_t id_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	char *buf = LOGIN;
 
+	if (!f || !s || !o) {
+		n = -EFAULT;
+		goto out;
+	}
 	if (n < LOGIN_LEN || *o >= LOGIN_LEN)
 	{
 		n = n < LOGIN_LEN ? -EINVAL : 0;
@@ -66,6 +74,8 @@ static ssize_t foo_write(struct file *f, const char __user *s, size_t n, loff_t 
 	ret = mutex_lock_interruptible(&g_mutex);
 	if (ret)
 		goto out;
+	if (!f || !s)
+		goto out;
 	if (n > PAGE_SIZE)
 	{
 		ret = -EINVAL;
@@ -89,6 +99,8 @@ static ssize_t foo_read(struct file *f, char __user *s, size_t n, loff_t *o)
 		n = len;
 		goto out;
 	}
+	if (!f || !s || !o)
+		goto out;
 	len = strlen(page_buf);
 	if (*o >= len)
 	{

@@ -19,6 +19,10 @@ static ssize_t hello_write(struct file *f, const char __user *s, size_t n, loff_
 	char buf[LOGIN_LEN];
 	int retval = -EINVAL;	
 
+	if (!f || !s) {
+		retval = -EFAULT;
+		goto out;
+	}
 	if (n != LOGIN_LEN)
 	{
 		retval = -EINVAL;
@@ -39,6 +43,10 @@ static ssize_t hello_read(struct file *f, char __user *s, size_t n, loff_t *o)
 {
 	char *buf = LOGIN;
 
+	if (!f || !s || !o) {
+		n = -EFAULT;
+		goto out;
+	}
 	if (n < LOGIN_LEN || *o >= LOGIN_LEN)
 	{
 		n = n < LOGIN_LEN ? -EINVAL : 0;

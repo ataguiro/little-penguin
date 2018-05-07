@@ -110,6 +110,8 @@ static int long_read(struct seq_file *m, void *v)
 	struct dentry *mnt_root;
 	char *path = NULL;
 
+	if (!m)
+		goto end;
 	list_for_each_entry(mnt_space, &ns->list, mnt_list)
 	{
 		if (mnt_space->mnt_id)
@@ -136,6 +138,8 @@ static int long_open(struct inode *inode, struct file *f)
 
 	ret = mutex_lock_interruptible(&g_mutex);
 	if (ret)
+		goto end;
+	if (!inode || !f)
 		goto end;
 	f->private_data = NULL;
 	ret = single_open(f, long_read, NULL);

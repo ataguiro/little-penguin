@@ -3,7 +3,7 @@
 int main(int ac, char **av)
 {
 	char buf[256] = {0};
-	int fd = open("/dev/fourtytwo", O_RDWR);
+	int fd = open("/dev/fortytwo", O_RDWR);
 
 	read(fd, buf, 4);
 	printf("buf: %s (4)\n", buf);
