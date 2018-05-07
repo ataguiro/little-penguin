@@ -65,7 +65,7 @@ static int __init hello_init(void) {
 	int ret;
 	printk(KERN_INFO "Hello World !\n");
 	my_dev.minor = MISC_DYNAMIC_MINOR;
-	my_dev.name = "fourtytwo";
+	my_dev.name = "fortytwo";
 	my_dev.fops = &my_fops;
 	ret = misc_register(&my_dev);
 	return ret;

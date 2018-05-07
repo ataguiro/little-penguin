@@ -123,7 +123,7 @@ static int __init hello_init(void) {
 
 	printk(KERN_INFO "Hello World !\n");
 	mutex_init(&g_mutex);
-	my_root = debugfs_create_dir("fourtytwo", NULL);
+	my_root = debugfs_create_dir("fortytwo", NULL);
 	if (!my_root)
 	{
 		retval = -ENOENT;
