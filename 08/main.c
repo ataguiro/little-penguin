@@ -34,13 +34,16 @@ static int __init myfd_init(void)
 {
 	int retval;
 
+	tmp2 = NULL;
 	retval = misc_register(&myfd_device);
 	return retval;
 }
 
 static void __exit myfd_cleanup(void)
 {
-	kfree(tmp2);
+	if (tmp2)
+		kfree(tmp2);
+	tmp2 = NULL;
 	misc_deregister(&myfd_device);
 }
 
@@ -52,6 +55,8 @@ ssize_t myfd_read(struct file *fp, char __user *user, size_t size, loff_t *offs)
 	 * Malloc like a boss
 	 ***************/
 
+	if (tmp2)
+		kfree(tmp2);
 	tmp2 = kmalloc(sizeof(char) * PAGE_SIZE * 2, GFP_KERNEL);
 	tmp = tmp2;
 	for (t = strlen(str) - 1, i = 0; t >= 0; t--, i++)
